@@ -9,10 +9,12 @@ namespace UI
         static void Main()
         {
             AppService appService = new AppService();
-
+            appService.dbInit();
+            
             bool isRunning = true;
 
-
+            Console.WriteLine("db Initialized");
+            
             while(isRunning)
             {
                 
