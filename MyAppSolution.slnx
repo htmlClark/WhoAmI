@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Core/Core.csproj" />
+  <Project Path="DataLayer/DataLayer.csproj" />
+  <Project Path="LogicLayer/LogicLayer.csproj" />
+  <Project Path="UILayer/UILayer.csproj" />
+</Solution>
