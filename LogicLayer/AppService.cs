@@ -1,9 +1,17 @@
-﻿namespace LogicLayer;
+﻿using DataLayer;
+
+namespace LogicLayer;
 
 public class AppService
 {
-    public string sendMessage()
+    public bool isNameValid(string NameFromUser)
     {
-        return "Hello from LogicLayer";
+        DataService dataService = new DataService();
+
+        if (!string.IsNullOrEmpty(NameFromUser))
+        {
+            return dataService.doesNameExist(NameFromUser);
+        }
+        return false;
     }
 }
