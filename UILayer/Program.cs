@@ -1,4 +1,5 @@
 ﻿using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using LogicLayer; 
 
 namespace UI
@@ -17,7 +18,7 @@ namespace UI
     // - Fix: None
     class Program
     {
-        static AppService appService = new AppService();
+        private static AppService appService = new AppService();
         static string MAINMENU = """
         1. Create a profile
         2. Find a profile
@@ -34,7 +35,7 @@ namespace UI
             """;
         static void Main()
         {
-            if (appService.dbInit())
+            if (appService.startDb())
             {
                 App();
             }
@@ -45,7 +46,6 @@ namespace UI
                 Console.ResetColor();
             }
         }
-
         static void App()
         {
             bool isAppRun = true;
@@ -54,7 +54,7 @@ namespace UI
             {
                 Console.Clear();
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine(ASCII + "\n");
                 Console.ResetColor();
                 Console.WriteLine(MAINMENU + "\n");
@@ -64,7 +64,7 @@ namespace UI
 
                 if (string.IsNullOrWhiteSpace(userInput))
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("- Option cannot be empty.\n");
                     Console.ResetColor();
 
@@ -76,23 +76,23 @@ namespace UI
                 switch (userInput)
                 {
                     case "1":
-                        createProfile();
+                        CreateProfile();
                         break;
 
                     case "2":
-                        findProfile();
+                        FindProfile();
                         break;
 
                     case "3":
-                        updateProfile();
+                        UpdateProfile();
                         break;
 
                     case "4":
-                        deleteProfile();
+                        DeleteProfile();
                         break;
 
                     case "5":
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Closing Program...");
                         Console.ResetColor();
                         isAppRun = false;
@@ -109,19 +109,82 @@ namespace UI
                 }
             }
         }
-        static void createProfile()
+        static void CreateProfile()
         {
-            Console.WriteLine("Create a profile");
-            Console.ReadKey();
+            bool isRunning = true;
+
+            while (isRunning)
+            {
+                Console.Clear();
+
+                Console.WriteLine("Create a new profile (X to exit)");
+                Console.Write("> ");
+                string newProfile = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(newProfile))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("- Profile cannot be empty.\n");
+                    Console.ResetColor();
+                    Console.ReadKey();
+                    continue;
+                }
+
+                newProfile = newProfile.ToLower();
+
+                if(newProfile == "x")
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("- Returning to Main Menu...\n");
+                    Console.ResetColor();
+
+                    Console.ReadKey();
+                    return;
+                }
+
+                if (appService.isSmaller(newProfile))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"- \"{newProfile}\" is too short, 3 is the minimum lenght.");
+                    Console.ResetColor();
+
+                    Console.ReadKey();
+                }
+                else if(appService.isLarger(newProfile))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"- \"{newProfile}\" has reached the limit, 16 is the maximum lenght.");
+                    Console.ResetColor();
+
+                    Console.ReadKey();
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Profile successfully created!\n");
+                    Console.ResetColor();
+
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("- Returning to Main Menu...");
+                    Console.ResetColor();
+                    
+                    Console.ReadKey();
+                    return;
+                    
+                }
+            }   
+            
         }
-        static void findProfile()
+        static void FindProfile()
         {   
             bool isRunning = true;
 
             while(isRunning)
             {
                 Console.Clear();
-                Console.Write("> Enter your name (X to exit): ");
+
+                Console.WriteLine("Enter your name (X to exit)");
+                Console.Write("> ");
                 string Name = Console.ReadLine();
 
                 if(string.IsNullOrWhiteSpace(Name)) 
@@ -133,12 +196,12 @@ namespace UI
                     continue;
                 }
 
-                Name.ToLower();
+                Name = Name.ToLower();
 
                 if(Name.ToLower() == "x")
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("- Back to Main Menu...\n");
+                    Console.WriteLine("- Returning to Main Menu...\n");
                     Console.ResetColor();
                     Console.ReadKey();
                     return;
@@ -160,12 +223,12 @@ namespace UI
                 }
             }
         }
-        static void updateProfile()
+        static void UpdateProfile()
         {
             Console.WriteLine("Update a profile");
             Console.ReadKey();
         }
-        static void deleteProfile()
+        static void DeleteProfile()
         {
             Console.WriteLine("Delete a profile");
             Console.ReadKey();

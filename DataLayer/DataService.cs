@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Core;
 using Microsoft.Data.Sqlite;
@@ -8,20 +9,18 @@ namespace DataLayer
     public class DataService
     {
         private Database database = new Database();
-
-        public void addStudent(string ValidName)
+        public void AddStudent(string validName)
         {
             var connection = database.GetConnection();
             connection.Open();
 
             var command = connection.CreateCommand();
-            command.CommandText = @"INSERT INTO Students (Name) VALUES (@name)";
-            command.Parameters.AddWithValue(@"Validname", ValidName);
+            command.CommandText = @"INSERT INTO Students (Name) VALUES (@validNname)";
+            command.Parameters.AddWithValue(@"validName", validName);
 
             command.ExecuteNonQuery();
         }
-
-        public bool doesNameExist(string nameToLook)
+        public bool DoesStudentExist(string nameToLook)
         {
             var connection = database.GetConnection();
             connection.Open();
@@ -34,8 +33,7 @@ namespace DataLayer
 
             return count > 0;
         }
-
-        public void updateStudent(int studentId, string newName)
+        public void UpdateStudent(int studentId, string newName)
         {
             var connection = database.GetConnection();
             connection.Open();
@@ -47,7 +45,7 @@ namespace DataLayer
 
             command.ExecuteNonQuery();
         }
-        public void deleteStudent(int studentId, string StudentName)
+        public void DeleteStudent(int studentId, string StudentName)
         {
             var connection = database.GetConnection();
             connection.Open();
@@ -62,40 +60,40 @@ namespace DataLayer
 
     public class Database
     {
-        private string connectionString = "Data Source=app.db";
-
+        private string connectionString = "Data Source=whomai.db";
         public SqliteConnection GetConnection()
         {
             return new SqliteConnection(connectionString);
         }
-
-        public bool TestConnection()
+        public bool InitDb()
         {
             try
             {
                 using var connection = GetConnection();
                 connection.Open();
-                return true;
-            }
-            catch
+
+                var command = connection.CreateCommand();
+
+                command.CommandText = 
+                @"CREATE TABLE IF NOT EXISTS Students(
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Name TEXT NOT NULL UNIQUE);
+                ";
+                command.ExecuteNonQuery();
+
+                command.CommandText = @"INSERT OR IGNORE INTO Students (Name) VALUES ('lily');";
+                command.ExecuteNonQuery();
+
+                command.CommandText = @"INSERT OR IGNORE INTO Students (Name) VALUES ('clark');";
+                command.ExecuteNonQuery();
+
+                return true; 
+                
+            } catch
             {
                 return false;
             }
-        }
-        public void Init()
-        {
-            using var connection = GetConnection();
-            connection.Open();
-
-            var command = connection.CreateCommand();
-
-            command.CommandText = 
-            @"CREATE TABLE IF NOT EXISTS Students(
-            Id INTEGER PRIMARY KEY AUTOINCREMENT,
-            Name TEXT NOT NULL);
-            ";
-
-            command.ExecuteNonQuery();
+            
         }
     }
 }
