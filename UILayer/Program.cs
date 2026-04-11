@@ -4,9 +4,20 @@ using LogicLayer;
 namespace UI
 {
 
-    // WhoAmI Console App version : 0.1.0 - Initial Project Setup 
-    // WhoAmI Console App version : 0.2.1 - (Feature) Live database (Sqlite Only) | (Fix) Name validation preveneting emptry whitespaces to bypass the read.
-    // WhoAmI Console App version : 0.3.1 - (Feature) Color coded text outputs | (Fix) None
+   
+    // WhoAmI Console App v0.1.0
+    // - Initial project setup
+
+     // WhoAmI Console App v0.2.0
+    // - Feature: Live SQLite database support
+
+    // WhoAmI Console App v0.2.1
+    // - Fix: Prevent empty/whitespace name bypass validation
+
+    // WhoAmI Console App v0.3.0
+    // - Feature: Color-coded console outputs
+    // - Fix: None
+    
     class Program
     {
         static void Main()
