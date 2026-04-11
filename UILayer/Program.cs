@@ -164,6 +164,8 @@ namespace UI
                     Console.WriteLine("Profile successfully created!\n");
                     Console.ResetColor();
 
+                    appService.addProfile(newProfile);
+
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine("- Returning to Main Menu...");
                     Console.ResetColor();
@@ -207,7 +209,7 @@ namespace UI
                     return;
                 }
 
-                if (appService.isNameValid(Name))
+                if (appService.profileToLook(Name))
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"- Hello, {Name}!\n");

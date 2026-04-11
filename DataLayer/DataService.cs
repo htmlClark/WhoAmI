@@ -9,14 +9,14 @@ namespace DataLayer
     public class DataService
     {
         private Database database = new Database();
-        public void AddStudent(string validName)
+        public void AddProfile(string validProfile)
         {
             var connection = database.GetConnection();
             connection.Open();
 
             var command = connection.CreateCommand();
-            command.CommandText = @"INSERT INTO Students (Name) VALUES (@validNname)";
-            command.Parameters.AddWithValue(@"validName", validName);
+            command.CommandText = @"INSERT INTO Students (Name) VALUES (@validProfile)";
+            command.Parameters.AddWithValue(@"validProfile", validProfile);
 
             command.ExecuteNonQuery();
         }
@@ -60,7 +60,7 @@ namespace DataLayer
 
     public class Database
     {
-        private string connectionString = "Data Source=whomai.db";
+        private string connectionString = "Data Source=whoAmI.db";
         public SqliteConnection GetConnection()
         {
             return new SqliteConnection(connectionString);

@@ -21,11 +21,16 @@ public class AppService
         
         return stringSize > 16;
     }
+
+    public void addProfile(string validNewProfile)
+    {
+        if (!isLarger(validNewProfile) && !isSmaller(validNewProfile)) dataService.AddProfile(validNewProfile);
+    }
     public bool startDb()
     {
         return db.InitDb();
     }
-    public bool isNameValid(string nameFromUser)
+    public bool profileToLook(string nameFromUser)
     {
         if (!string.IsNullOrWhiteSpace(nameFromUser))
         {
