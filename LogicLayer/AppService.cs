@@ -1,20 +1,20 @@
-﻿using DataLayer;
+﻿using System.Net.Http.Headers;
+using DataLayer;
 
 namespace LogicLayer;
 
 public class AppService
 {   
-    Database db = new Database();
+    private Database db = new Database();
+    private DataService dataService = new DataService();
 
-    public void dbInit()
+    public bool dbInit()
     {
-        db.Init();
+        return db.TestConnection();
     }
     public bool isNameValid(string NameFromUser)
     {
-        DataService dataService = new DataService();
-
-        if (!string.IsNullOrEmpty(NameFromUser))
+        if (!string.IsNullOrWhiteSpace(NameFromUser))
         {
             return dataService.doesNameExist(NameFromUser);
         }

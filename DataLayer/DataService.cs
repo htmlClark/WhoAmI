@@ -1,32 +1,62 @@
-﻿using Core;
+﻿using System.Data;
+using System.Runtime.InteropServices;
+using Core;
 using Microsoft.Data.Sqlite;
 
 namespace DataLayer
 {
     public class DataService
     {
-        List<Student> studentNames = new List<Student>
+        private Database database = new Database();
+
+        public void addStudent(string ValidName)
         {
-            new Student
-            {
-                Name = "clark"
-            },
-            new Student
-            {
-                Name = "lily"
-            }
-        };
-        
-        public bool doesNameExist(string validName)
+            var connection = database.GetConnection();
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"INSERT INTO Students (Name) VALUES (@name)";
+            command.Parameters.AddWithValue(@"Validname", ValidName);
+
+            command.ExecuteNonQuery();
+        }
+
+        public bool doesNameExist(string nameToLook)
         {
-            foreach (Student s in studentNames)
-            {
-                if(s.Name == validName)
-                {
-                    return true;
-                }
-            }
-            return false;
+            var connection = database.GetConnection();
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"SELECT COUNT(*) FROM Students WHERE Name = @nameToLook";
+            command.Parameters.AddWithValue(@"nameToLook", nameToLook);
+            
+            long count = (long)command.ExecuteScalar();
+
+            return count > 0;
+        }
+
+        public void updateStudent(int studentId, string newName)
+        {
+            var connection = database.GetConnection();
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"UPDATE Students SET Name = @newName WHERE Id = @studentId";
+            command.Parameters.AddWithValue("@newName", newName);
+            command.Parameters.AddWithValue("@studentId", studentId);
+
+            command.ExecuteNonQuery();
+        }
+        public void deleteStudent(int studentId, string StudentName)
+        {
+            var connection = database.GetConnection();
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"DELETE FROM Students WHERE Id = @studentId";
+            command.Parameters.AddWithValue(@"studentId", studentId);
+
+            command.ExecuteNonQuery();
         }
     }
 
@@ -34,9 +64,27 @@ namespace DataLayer
     {
         private string connectionString = "Data Source=app.db";
 
+        public SqliteConnection GetConnection()
+        {
+            return new SqliteConnection(connectionString);
+        }
+
+        public bool TestConnection()
+        {
+            try
+            {
+                using var connection = GetConnection();
+                connection.Open();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         public void Init()
         {
-            using var connection = new SqliteConnection(connectionString);
+            using var connection = GetConnection();
             connection.Open();
 
             var command = connection.CreateCommand();
