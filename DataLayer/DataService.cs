@@ -11,7 +11,7 @@ namespace DataLayer
         private Database database = new Database();
         public void AddProfile(string validProfile)
         {
-            var connection = database.GetConnection();
+            using var connection = database.GetConnection();
             connection.Open();
 
             var command = connection.CreateCommand();
@@ -22,7 +22,7 @@ namespace DataLayer
         }
         public bool DoesStudentExist(string nameToLook)
         {
-            var connection = database.GetConnection();
+            using var connection = database.GetConnection();
             connection.Open();
 
             var command = connection.CreateCommand();
@@ -33,28 +33,52 @@ namespace DataLayer
 
             return count > 0;
         }
-        public void UpdateStudent(int studentId, string newName)
+        public void UpdateStudent(string oldName, string newName)
         {
             var connection = database.GetConnection();
             connection.Open();
 
             var command = connection.CreateCommand();
-            command.CommandText = @"UPDATE Students SET Name = @newName WHERE Id = @studentId";
+            command.CommandText = @"UPDATE Students SET Name = @newName WHERE Name = @oldName";
             command.Parameters.AddWithValue("@newName", newName);
-            command.Parameters.AddWithValue("@studentId", studentId);
+            command.Parameters.AddWithValue("@oldName", oldName);
 
             command.ExecuteNonQuery();
         }
-        public void DeleteStudent(int studentId, string StudentName)
+        public void DeleteStudent(string nameToDelete)
         {
-            var connection = database.GetConnection();
+            using var connection = database.GetConnection();
             connection.Open();
 
             var command = connection.CreateCommand();
-            command.CommandText = @"DELETE FROM Students WHERE Id = @studentId";
-            command.Parameters.AddWithValue(@"studentId", studentId);
+            command.CommandText = @"DELETE FROM Students WHERE Name = @nameToDelete";
+            command.Parameters.AddWithValue(@"nameToDelete", nameToDelete);
 
             command.ExecuteNonQuery();
+        }
+
+        public List<Student> GetAllProfiles()
+        {
+            List<Student> students = new List<Student>();
+
+            using var connection = database.GetConnection();
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT Id, Name FROM Students";
+
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                students.Add(new Student
+                {
+                   Id = reader.GetInt32(0),
+                   Name = reader.GetString(1) 
+                });
+            }
+
+            return students;
         }
     }
 

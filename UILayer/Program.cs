@@ -1,5 +1,7 @@
-﻿using System.Reflection.Metadata;
+﻿using System.Data.Common;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
+using Core;
 using LogicLayer; 
 
 namespace UI
@@ -16,6 +18,15 @@ namespace UI
     // WhoAmI Console App v0.3.0-alpha
     // - Feature: Color-coded console outputs
     // - Fix: None
+
+    // New Things Added:
+    // Update profile method
+    // Delete profile method
+    // Table of profiles method 
+
+    // TO FOLLOW
+    // Console UI optimization
+    
     class Program
     {
         private static AppService appService = new AppService();
@@ -24,7 +35,8 @@ namespace UI
         2. Find a profile
         3. Update a profile
         4. Delete a profile
-        5. Exit Program
+        5. Show All Profiles
+        6. Exit Program
         """;
         static string ASCII = """ 
             ========================================
@@ -92,15 +104,17 @@ namespace UI
                         break;
 
                     case "5":
+                        ShowAllProfiles();
+                        break;
+                    case "6":
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Closing Program...");
+                        Console.WriteLine("- Closing Program...");
                         Console.ResetColor();
                         isAppRun = false;
                         break;
-
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"\n'{userInput}' is not a valid option");
+                        Console.WriteLine($"- '{userInput}' is not a valid option\n");
                         Console.ResetColor();
 
                         Console.WriteLine("Press any key to continue...");
@@ -227,15 +241,126 @@ namespace UI
         }
         static void UpdateProfile()
         {
-            Console.WriteLine("Update a profile");
-            Console.ReadKey();
+           Console.Clear();
+
+            while (true)
+            {
+                Console.Clear();
+
+                Console.WriteLine("Type a profile name (X to exit)");
+                Console.Write("> ");
+                string profileToUpdate = Console.ReadLine().ToLower();
+
+                if(profileToUpdate == "x") return;
+
+                if (string.IsNullOrWhiteSpace(profileToUpdate))
+                {
+                    Console.WriteLine("- Field cannot be empty.");
+                    Console.ReadKey();
+                }
+                else
+                {
+                    while(true)
+                    {
+                        if(appService.profileToLook(profileToUpdate))
+                        {
+                            Console.Clear();
+
+                            Console.WriteLine($"- Hello, {profileToUpdate}!");
+                            Console.WriteLine("Press any key to continue...");
+                            Console.ReadKey();
+
+                            while (true)
+                            {
+                                Console.Clear();
+
+                                Console.WriteLine($"Enter your new profile name for {profileToUpdate} (X to exit)");
+                                Console.Write("> ");
+                                string updatedProfile = Console.ReadLine().ToLower();
+
+                                if(updatedProfile == "x") return;
+
+                                if (string.IsNullOrWhiteSpace(updatedProfile))
+                                {
+                                    Console.WriteLine("- Field cannot be empty");
+                                    Console.ReadKey();
+                                }
+                                else
+                                {
+                                    appService.updateProfile(profileToUpdate, updatedProfile);
+                                    Console.WriteLine("- Profile successfully updated!");
+                                    Console.ReadKey();
+                                    return;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"- {profileToUpdate} profile does not exist");
+                            Console.ReadKey();
+                            break;
+                        }
+                    }
+                }
+            }
         }
         static void DeleteProfile()
         {
-            Console.WriteLine("Delete a profile");
+            Console.Clear();
+
+            while (true)
+            {
+                Console.Clear();
+
+                Console.WriteLine("Type a profile to delete (X to exit)");
+                Console.Write("> ");
+                string profileToDelete = Console.ReadLine().ToLower();
+
+                if(profileToDelete == "x") return;
+
+                if (string.IsNullOrWhiteSpace(profileToDelete))
+                {
+                    Console.WriteLine("- Field cannot be empty.");
+                    Console.ReadKey();
+                }
+                else
+                {
+                    Console.Clear();
+                    if (appService.profileToLook(profileToDelete))
+                    {
+                        appService.deleteProfile(profileToDelete);
+                        Console.WriteLine($"{profileToDelete} has been deleted!");
+                        Console.ReadKey();
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{profileToDelete} does not exist.");
+                        Console.ReadKey();
+                    }
+                }
+            }
+        }
+        static void ShowAllProfiles()
+        {
+            Console.Clear();
+
+            List<Student> students = appService.FetchProfileFromDb();
+
+            Console.WriteLine("Current Profiles: \n");
+            Console.WriteLine("=================================");
+            Console.WriteLine($"{"ID",-9} | {"STUDENT NAME",-20}");
+            Console.WriteLine("=================================");  
+
+            foreach(var s in students)
+            {
+                Console.WriteLine($"Id: {s.Id, -5} | Student: {s.Name, -20}");
+            }
+
+            Console.WriteLine("=================================");
+            Console.Write("\n");
+            Console.WriteLine("Press any key to continue... ");
             Console.ReadKey();
         }
-        
     }
 }
 
