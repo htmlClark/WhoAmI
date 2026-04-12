@@ -37,18 +37,9 @@ public class AppService
         }
         return false;
     }
-
-    public void updateProfile(string oldProfile, string newProfile)
-    {
-        dataService.UpdateStudent(oldProfile, newProfile);
-    }
     public List<Student> FetchProfileFromDb()
     {
         return dataService.GetAllProfiles();
-    }
-    public void DeleteProfileInDb(string profileToDelete)
-    {
-        dataService.DeleteStudent(profileToDelete);
     }
     public bool isSpecialCharacters(string profileFromUser)
     {
@@ -73,5 +64,13 @@ public class AppService
             }
         }
         return false;
+    }
+    public void DeleteProfileInDb(string profileToDelete)
+    {
+        dataService.DeleteStudent(profileToDelete);
+    }
+    public void CommitProfileToDb(string oldProfile, string newProfile)
+    {
+        dataService.UpdateStudent(oldProfile, newProfile);
     }
 }

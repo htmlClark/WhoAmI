@@ -35,7 +35,7 @@ namespace DataLayer
         }
         public void UpdateStudent(string oldName, string newName)
         {
-            var connection = database.GetConnection();
+            using var connection = database.GetConnection();
             connection.Open();
 
             var command = connection.CreateCommand();
@@ -56,7 +56,6 @@ namespace DataLayer
 
             command.ExecuteNonQuery();
         }
-
         public List<Student> GetAllProfiles()
         {
             List<Student> students = new List<Student>();
@@ -81,7 +80,6 @@ namespace DataLayer
             return students;
         }
     }
-
     public class Database
     {
         private string connectionString = "Data Source=studentProfile.db";

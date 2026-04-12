@@ -24,6 +24,27 @@ namespace UI
     // Fix: Duplicated profile SQLite exception 
     // Fix: Prevent special characters 
 
+    // MAJOR CHANGES TO DO
+    // Make UI a library only
+    // Switch to Full Database
+    // Improve encapsulation further 
+    // Error and Exception Handling
+    // Add new data:
+    // Student Id
+    // Student Age
+    // Student Number
+    // Guardian Number
+    // First Name
+    // Last Name
+    // Middle Name
+    // Course
+    // 1st year semestral GWA
+    // 2nd year semestral GWA
+    // 3rd year semestral GWA
+    // 4th year semestral GWA
+    // IsEnrolled
+    // IsPayed
+    // IsScholarshipApplicable
     class Program
     {
         private static AppService appService = new AppService();
@@ -300,17 +321,17 @@ namespace UI
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"- Hello, {profileToUpdate}!\n");
+                    Console.ResetColor();
+
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey(true);
+
                     while(true)
                     {
                         if(appService.profileToLook(profileToUpdate))
                         {
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine($"- Hello, {profileToUpdate}!\n");
-                            Console.ResetColor();
-
-                            Console.WriteLine("Press any key to continue...");
-                            Console.ReadKey(true);
-
                             while (true)
                             {
                                 Console.Clear();
@@ -320,6 +341,7 @@ namespace UI
                                 string updatedProfile = Console.ReadLine().ToLower();
 
                                 if(updatedProfile == "x") return;
+
                                 if (appService.isSpecialCharacters(updatedProfile))
                                 {
                                     Console.ForegroundColor = ConsoleColor.Red;
@@ -330,6 +352,7 @@ namespace UI
                                     Console.ReadKey(true);
                                     continue;
                                 }
+
                                 if (appService.findDuplicate(updatedProfile))
                                 {
                                     Console.ForegroundColor = ConsoleColor.Red;
@@ -352,14 +375,42 @@ namespace UI
                                 }
                                 else
                                 {
-                                    appService.updateProfile(profileToUpdate, updatedProfile);
-                                    Console.ForegroundColor = ConsoleColor.Green;
-                                    Console.WriteLine($"- Profile successfully updated to \"{updatedProfile}\".\n");
-                                    Console.ResetColor();
+                                    if (appService.isSmaller(updatedProfile))
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Red;
+                                        Console.WriteLine($"- \"{updatedProfile}\" is too short, 3 is the minimum lenght.\n");
+                                        Console.ResetColor();
 
-                                    Console.WriteLine("Press any key to continue...");
-                                    Console.ReadKey(true);
-                                    return;
+                                        Console.WriteLine("Press any key to continue...");
+                                        Console.ReadKey(true);
+                                        continue;
+                                    }
+                                    else if(appService.isLarger(updatedProfile))
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Red;
+                                        Console.WriteLine($"- \"{updatedProfile}\" has reached the limit, 16 is the maximum lenght.\n");
+                                        Console.ResetColor();
+
+                                        Console.WriteLine("Press any key to continue...");
+                                        Console.ReadKey(true);
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        appService.CommitProfileToDb(profileToUpdate, updatedProfile);
+
+                                        Console.ForegroundColor = ConsoleColor.Green;
+                                        Console.WriteLine($"- \"{profileToUpdate}\" successfully updated to \"{updatedProfile}\" \n");
+                                        Console.ResetColor();
+
+                                        Console.ForegroundColor = ConsoleColor.Cyan;
+                                        Console.WriteLine("Returning to Main Menu...");
+                                        Console.ResetColor();
+                                        
+                                        Console.ReadKey(true);
+                                        return;
+                                        
+                                    }
                                 }
                             }
                         }
