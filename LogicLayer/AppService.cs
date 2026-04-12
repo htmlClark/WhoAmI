@@ -46,8 +46,32 @@ public class AppService
     {
         return dataService.GetAllProfiles();
     }
-    public void deleteProfile(string profileToDelete)
+    public void DeleteProfileInDb(string profileToDelete)
     {
         dataService.DeleteStudent(profileToDelete);
+    }
+    public bool isSpecialCharacters(string profileFromUser)
+    {
+        foreach(char c in profileFromUser)
+        {
+            if (!char.IsLetter(c))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    public bool findDuplicate(string profileToScan)
+    {
+        List<Student> students = dataService.GetAllProfiles();
+
+        foreach(var s in students)
+        {
+            if(s.Name == profileToScan)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

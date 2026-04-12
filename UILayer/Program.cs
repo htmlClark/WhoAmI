@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Drawing;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using Core;
@@ -17,16 +18,12 @@ namespace UI
 
     // WhoAmI Console App v0.3.0-alpha
     // - Feature: Color-coded console outputs
-    // - Fix: None
 
-    // New Things Added:
-    // Update profile method
-    // Delete profile method
-    // Table of profiles method 
+    // WhoAmI Console App v0.3.1-alpha
+    // Feature: (New) Added a show profile option
+    // Fix: Duplicated profile SQLite exception 
+    // Fix: Prevent special characters 
 
-    // TO FOLLOW
-    // Console UI optimization
-    
     class Program
     {
         private static AppService appService = new AppService();
@@ -55,6 +52,10 @@ namespace UI
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Error: Connection Failed\n");
+                Console.ResetColor();
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("- Closing Program...");
                 Console.ResetColor();
             }
         }
@@ -107,8 +108,9 @@ namespace UI
                         ShowAllProfiles();
                         break;
                     case "6":
+                        Console.Write("\n");
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("- Closing Program...");
+                        Console.WriteLine("Closing Program...");
                         Console.ResetColor();
                         isAppRun = false;
                         break;
@@ -131,60 +133,89 @@ namespace UI
             {
                 Console.Clear();
 
-                Console.WriteLine("Create a new profile (X to exit)");
+                Console.WriteLine("Enter a new profile (X to exit)");
                 Console.Write("> ");
-                string newProfile = Console.ReadLine();
+                string newProfile = Console.ReadLine().ToLower();
 
                 if (string.IsNullOrWhiteSpace(newProfile))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("- Profile cannot be empty.\n");
                     Console.ResetColor();
-                    Console.ReadKey();
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey(true);
                     continue;
                 }
 
-                newProfile = newProfile.ToLower();
-
                 if(newProfile == "x")
                 {
+                    Console.Write("\n");
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("- Returning to Main Menu...\n");
+                    Console.Write("Returning to Main Menu...");
                     Console.ResetColor();
 
-                    Console.ReadKey();
+                    Console.ReadKey(true);
                     return;
+                }
+
+                if (appService.isSpecialCharacters(newProfile))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"- \"{newProfile}\" contains special character(s), please use letters only.\n");
+                    Console.ResetColor();
+
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey(true);
+                    continue;
+                }
+
+                if (appService.findDuplicate(newProfile))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("- Attempting to duplicate a profile, please try again.\n");
+                    Console.ResetColor();
+                    
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ResetColor();
+
+                    Console.ReadKey(true);
+                    continue;
                 }
 
                 if (appService.isSmaller(newProfile))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"- \"{newProfile}\" is too short, 3 is the minimum lenght.");
+                    Console.WriteLine($"- \"{newProfile}\" is too short, 3 is the minimum lenght.\n");
                     Console.ResetColor();
 
-                    Console.ReadKey();
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey(true);
+                    continue;
                 }
                 else if(appService.isLarger(newProfile))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"- \"{newProfile}\" has reached the limit, 16 is the maximum lenght.");
+                    Console.WriteLine($"- \"{newProfile}\" has reached the limit, 16 is the maximum lenght.\n");
                     Console.ResetColor();
 
-                    Console.ReadKey();
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey(true);
+                    continue;
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Profile successfully created!\n");
-                    Console.ResetColor();
-
                     appService.addProfile(newProfile);
 
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("- Profile successfully created!\n");
+                    Console.ResetColor();
+
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("- Returning to Main Menu...");
+                    Console.WriteLine("Returning to Main Menu...");
                     Console.ResetColor();
                     
-                    Console.ReadKey();
+                    Console.ReadKey(true);
                     return;
                     
                 }
@@ -199,43 +230,48 @@ namespace UI
             {
                 Console.Clear();
 
-                Console.WriteLine("Enter your name (X to exit)");
+                Console.WriteLine("Enter a profile to look (X to exit)");
                 Console.Write("> ");
-                string Name = Console.ReadLine();
+                string Name = Console.ReadLine().ToLower();
 
                 if(string.IsNullOrWhiteSpace(Name)) 
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("- Name cannot be empty.\n");
                     Console.ResetColor();
-                    Console.ReadKey();
+
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey(true);
                     continue;
                 }
 
-                Name = Name.ToLower();
-
                 if(Name.ToLower() == "x")
                 {
+                    Console.Write("\n");
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("- Returning to Main Menu...\n");
+                    Console.WriteLine("- Returning to Main Menu...");
                     Console.ResetColor();
-                    Console.ReadKey();
+                    Console.ReadKey(true);
                     return;
                 }
 
                 if (appService.profileToLook(Name))
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"- Hello, {Name}!\n");
+                    Console.WriteLine($"- Looking at {Name}'s profile:\n");
                     Console.ResetColor();
-                    Console.ReadKey();
+
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey(true);
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"- \"{Name}\" is not an enrolled student.\n");
                     Console.ResetColor();
-                    Console.ReadKey();
+
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey(true);
                 }
             }
         }
@@ -247,7 +283,7 @@ namespace UI
             {
                 Console.Clear();
 
-                Console.WriteLine("Type a profile name (X to exit)");
+                Console.WriteLine("Enter a profile name to update (X to exit)");
                 Console.Write("> ");
                 string profileToUpdate = Console.ReadLine().ToLower();
 
@@ -255,8 +291,12 @@ namespace UI
 
                 if (string.IsNullOrWhiteSpace(profileToUpdate))
                 {
-                    Console.WriteLine("- Field cannot be empty.");
-                    Console.ReadKey();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("- Field cannot be empty.\n");
+                    Console.ResetColor();
+
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey(true);
                 }
                 else
                 {
@@ -264,40 +304,73 @@ namespace UI
                     {
                         if(appService.profileToLook(profileToUpdate))
                         {
-                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"- Hello, {profileToUpdate}!\n");
+                            Console.ResetColor();
 
-                            Console.WriteLine($"- Hello, {profileToUpdate}!");
                             Console.WriteLine("Press any key to continue...");
-                            Console.ReadKey();
+                            Console.ReadKey(true);
 
                             while (true)
                             {
                                 Console.Clear();
 
-                                Console.WriteLine($"Enter your new profile name for {profileToUpdate} (X to exit)");
+                                Console.WriteLine($"Enter your new profile name for \"{profileToUpdate}\" (X to exit)");
                                 Console.Write("> ");
                                 string updatedProfile = Console.ReadLine().ToLower();
 
                                 if(updatedProfile == "x") return;
+                                if (appService.isSpecialCharacters(updatedProfile))
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"- \"{updatedProfile}\" contains special character(s), please use letters only.\n");
+                                    Console.ResetColor();
+
+                                    Console.WriteLine("Press any key to continue...");
+                                    Console.ReadKey(true);
+                                    continue;
+                                }
+                                if (appService.findDuplicate(updatedProfile))
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine($"- \"{updatedProfile}\" already used, use a different one.\n");
+                                    Console.ResetColor();
+                                    
+                                    Console.WriteLine("Press any key to continue...");
+                                    Console.ReadKey(true);
+                                    continue;
+                                }
 
                                 if (string.IsNullOrWhiteSpace(updatedProfile))
                                 {
-                                    Console.WriteLine("- Field cannot be empty");
-                                    Console.ReadKey();
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine("- Field cannot be empty.\n");
+                                    Console.ResetColor();
+
+                                    Console.WriteLine("Press any key to continue...");
+                                    Console.ReadKey(true);
                                 }
                                 else
                                 {
                                     appService.updateProfile(profileToUpdate, updatedProfile);
-                                    Console.WriteLine("- Profile successfully updated!");
-                                    Console.ReadKey();
+                                    Console.ForegroundColor = ConsoleColor.Green;
+                                    Console.WriteLine($"- Profile successfully updated to \"{updatedProfile}\".\n");
+                                    Console.ResetColor();
+
+                                    Console.WriteLine("Press any key to continue...");
+                                    Console.ReadKey(true);
                                     return;
                                 }
                             }
                         }
                         else
                         {
-                            Console.WriteLine($"- {profileToUpdate} profile does not exist");
-                            Console.ReadKey();
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"- {profileToUpdate} profile does not exist\n");
+                            Console.ResetColor();
+
+                            Console.WriteLine("Press any key to continue...");
+                            Console.ReadKey(true);
                             break;
                         }
                     }
@@ -320,22 +393,35 @@ namespace UI
 
                 if (string.IsNullOrWhiteSpace(profileToDelete))
                 {
-                    Console.WriteLine("- Field cannot be empty.");
-                    Console.ReadKey();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("- Field cannot be empty.\n");
+                    Console.ResetColor();
+
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey(true);
+                    continue;
                 }
                 else
                 {
-                    Console.Clear();
                     if (appService.profileToLook(profileToDelete))
                     {
-                        appService.deleteProfile(profileToDelete);
-                        Console.WriteLine($"{profileToDelete} has been deleted!");
-                        Console.ReadKey();
+                        appService.DeleteProfileInDb(profileToDelete);
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($"- {profileToDelete} successfully removed. \n");
+                        Console.ResetColor();
+
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
+                        return;
                     }
                     else
                     {
-                        Console.WriteLine($"{profileToDelete} does not exist.");
-                        Console.ReadKey();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"- {profileToDelete} does not exist.\n");
+                        Console.ResetColor();
+
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                     }
                 }
             }
@@ -345,8 +431,10 @@ namespace UI
             Console.Clear();
 
             List<Student> students = appService.FetchProfileFromDb();
-
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("Current Profiles: \n");
+            Console.ResetColor();
+
             Console.WriteLine("=================================");
             Console.WriteLine($"{"ID",-9} | {"STUDENT NAME",-20}");
             Console.WriteLine("=================================");  
@@ -356,10 +444,9 @@ namespace UI
                 Console.WriteLine($"Id: {s.Id, -5} | Student: {s.Name, -20}");
             }
 
-            Console.WriteLine("=================================");
-            Console.Write("\n");
+            Console.WriteLine("=================================\n");
             Console.WriteLine("Press any key to continue... ");
-            Console.ReadKey();
+            Console.ReadKey(true);
         }
     }
 }

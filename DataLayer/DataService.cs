@@ -84,7 +84,7 @@ namespace DataLayer
 
     public class Database
     {
-        private string connectionString = "Data Source=whoAmI.db";
+        private string connectionString = "Data Source=studentProfile.db";
         public SqliteConnection GetConnection()
         {
             return new SqliteConnection(connectionString);
